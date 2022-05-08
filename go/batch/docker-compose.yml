@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14
+    container_name: postgres_db
+    command: -c 'config_file=/etc/postgresql/postgresql.conf'
+    ports:
+      - 15432:5432
+    volumes:
+      - type: bind
+        source: ./script
+        target: /docker-entrypoint-initdb.d
+      - type: bind
+        source: ./config/postgresql.conf
+        target: /etc/postgresql/postgresql.conf
+    environment:
+      - POSTGRES_PASSWORD=passw0rd
+  batch:
+    container_name: kanzen-batch
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    environment:
+      ENV_NAME: docker-containers
+    depends_on:
+      - db
+    tty: true
+    command: date
+
+# postgresは以下を参考:
+# https://zenn.dev/re24_1986/articles/b76c3fd8f76aec
