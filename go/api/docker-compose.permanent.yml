@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14
+    container_name: postgres_db_permanent
+    command: -c 'config_file=/etc/postgresql/postgresql.conf'
+    ports:
+      - 15432:5432
+    volumes:
+      - type: volume
+        source: kanzen-db-store
+        target: /var/lib/postgresql/data
+      - type: bind
+        source: ./script
+        target: /docker-entrypoint-initdb.d
+      - type: bind
+        source: ./config/postgresql.conf
+        target: /etc/postgresql/postgresql.conf
+    environment:
+      - POSTGRES_PASSWORD=passw0rd
+volumes:
+  kanzen-db-store:
+
+# postgresは以下を参考:
+# https://zenn.dev/re24_1986/articles/b76c3fd8f76aec
